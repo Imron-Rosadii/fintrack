@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
-import { TransactionProvider } from "./context/TransactionProvider";
+import ProtectedLayout from "./components/auth/ProtectedLayout";
 
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import GuestRoute from "./components/auth/GuestRoute";
 
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import DashboardPage from "./pages/DashboardPage";
-import TransactionsPage from "./pages/TransactionsPage";
-import AnalyticsPage from "./pages/AnalyticsPage";
-import CategoriesPage from "./pages/CategoriesPage";
+// Lazy load halaman
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/RegisterPage"));
+const DashboardPage = lazy(() => import("./pages/DashboardPage"));
+const TransactionsPage = lazy(() => import("./pages/TransactionsPage"));
+const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
+const CategoriesPage = lazy(() => import("./pages/CategoriesPage"));
 
 function App() {
   const [isDark, setIsDark] = useState<boolean>(() => {
@@ -41,7 +42,13 @@ function App() {
   };
 
   return (
-    <TransactionProvider>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-gray-50 text-sm text-gray-500 dark:bg-gray-950 dark:text-gray-400">
+          Memuat halaman...
+        </div>
+      }
+    >
       <Routes>
         {/* Halaman khusus pengguna yang belum login */}
         <Route element={<GuestRoute />}>
@@ -51,51 +58,53 @@ function App() {
 
         {/* Halaman yang membutuhkan autentikasi */}
         <Route element={<ProtectedRoute />}>
-          <Route
-            path="/"
-            element={
-              <DashboardPage
-                isDark={isDark}
-                onToggleTheme={handleToggleTheme}
-              />
-            }
-          />
+          <Route element={<ProtectedLayout />}>
+            <Route
+              path="/"
+              element={
+                <DashboardPage
+                  isDark={isDark}
+                  onToggleTheme={handleToggleTheme}
+                />
+              }
+            />
 
-          <Route
-            path="/transactions"
-            element={
-              <TransactionsPage
-                isDark={isDark}
-                onToggleTheme={handleToggleTheme}
-              />
-            }
-          />
+            <Route
+              path="/transactions"
+              element={
+                <TransactionsPage
+                  isDark={isDark}
+                  onToggleTheme={handleToggleTheme}
+                />
+              }
+            />
 
-          <Route
-            path="/analytics"
-            element={
-              <AnalyticsPage
-                isDark={isDark}
-                onToggleTheme={handleToggleTheme}
-              />
-            }
-          />
+            <Route
+              path="/analytics"
+              element={
+                <AnalyticsPage
+                  isDark={isDark}
+                  onToggleTheme={handleToggleTheme}
+                />
+              }
+            />
 
-          <Route
-            path="/categories"
-            element={
-              <CategoriesPage
-                isDark={isDark}
-                onToggleTheme={handleToggleTheme}
-              />
-            }
-          />
+            <Route
+              path="/categories"
+              element={
+                <CategoriesPage
+                  isDark={isDark}
+                  onToggleTheme={handleToggleTheme}
+                />
+              }
+            />
+          </Route>
         </Route>
 
         {/* Route tidak dikenal */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </TransactionProvider>
+    </Suspense>
   );
 }
 

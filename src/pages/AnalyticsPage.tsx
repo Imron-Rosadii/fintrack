@@ -1,11 +1,15 @@
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { TrendingUp, TrendingDown, Wallet, PiggyBank } from "lucide-react";
 
 import DashboardLayout from "../components/templates/DashboardLayout";
-import FinanceChart from "../components/organisms/FinanceChart";
-import ExpenseCategoryChart from "../components/organisms/ExpenseCategoryChart";
 import TopSpendingCategories from "../components/organisms/TopSpendingCategories";
 import StatCard from "../components/molecules/StatCard";
+
+const FinanceChart = lazy(() => import("../components/organisms/FinanceChart"));
+
+const ExpenseCategoryChart = lazy(
+  () => import("../components/organisms/ExpenseCategoryChart"),
+);
 
 import useAnalytics from "../hooks/useAnalytics";
 import type { AnalyticsFilter } from "../hooks/useAnalytics";
@@ -240,8 +244,17 @@ function AnalyticsPage({ isDark, onToggleTheme }: AnalyticsPageProps) {
         </section>
 
         {/* Monthly Income vs Expense */}
+        {/* Monthly Income vs Expense */}
         <section className="min-w-0">
-          <FinanceChart data={monthlyData} />
+          <Suspense
+            fallback={
+              <div className="flex h-72 items-center justify-center text-sm text-gray-500">
+                Loading chart...
+              </div>
+            }
+          >
+            <FinanceChart data={monthlyData} />
+          </Suspense>
         </section>
 
         {/* Expense Distribution */}

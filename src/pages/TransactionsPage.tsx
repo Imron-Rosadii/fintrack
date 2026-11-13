@@ -135,8 +135,8 @@ function TransactionsPage({ isDark, onToggleTheme }: TransactionsPageProps) {
             <div className="flex flex-col gap-2 sm:flex-row">
               <button
                 type="button"
-                onClick={() =>
-                  exportTransactionsPdf({
+                onClick={async () => {
+                  await exportTransactionsPdf({
                     transactions: filteredTransactions,
                     monthFilter,
                     income: filteredTransactions
@@ -152,8 +152,8 @@ function TransactionsPage({ isDark, onToggleTheme }: TransactionsPageProps) {
                       filteredTransactions
                         .filter((item) => item.type === "expense")
                         .reduce((total, item) => total + item.amount, 0),
-                  })
-                }
+                  });
+                }}
                 disabled={filteredTransactions.length === 0}
                 className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
               >

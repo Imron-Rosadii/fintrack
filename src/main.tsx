@@ -4,7 +4,9 @@ import { BrowserRouter } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthProvider";
 
+import "@fontsource-variable/inter";
 import "./index.css";
+
 import App from "./App";
 
 createRoot(document.getElementById("root")!).render(

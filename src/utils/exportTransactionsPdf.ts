@@ -1,6 +1,3 @@
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-
 import type { Transaction } from "../types/transaction";
 
 interface ExportTransactionsPdfProps {
@@ -30,13 +27,19 @@ const formatPeriod = (month: string) => {
   }).format(new Date(year, monthNumber - 1, 1));
 };
 
-export function exportTransactionsPdf({
+export async function exportTransactionsPdf({
   transactions,
   monthFilter,
   income,
   expense,
   balance,
 }: ExportTransactionsPdfProps) {
+  // Library PDF hanya dimuat ketika fungsi ekspor dipanggil.
+  const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+    import("jspdf"),
+    import("jspdf-autotable"),
+  ]);
+
   const doc = new jsPDF();
 
   doc.setFontSize(18);
@@ -66,8 +69,9 @@ export function exportTransactionsPdf({
     },
   });
 
-  const summaryEndY = (doc as jsPDF & { lastAutoTable: { finalY: number } })
-    .lastAutoTable.finalY;
+  const summaryEndY = (
+    doc as typeof doc & { lastAutoTable: { finalY: number } }
+  ).lastAutoTable.finalY;
 
   autoTable(doc, {
     startY: summaryEndY + 10,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Plus } from "lucide-react";
 
 import DashboardLayout from "../components/templates/DashboardLayout";
@@ -6,7 +6,7 @@ import StatCard from "../components/molecules/StatCard";
 import Button from "../components/atoms/Button";
 import Card from "../components/atoms/Card";
 
-import FinanceChart from "../components/organisms/FinanceChart";
+const FinanceChart = lazy(() => import("../components/organisms/FinanceChart"));
 import TransactionForm from "../components/organisms/TransactionForm";
 import TransactionFilters from "../components/organisms/TransactionFilters";
 import TransactionTable from "../components/organisms/TransactionTable";
@@ -75,7 +75,17 @@ function DashboardPage({ isDark, onToggleTheme }: DashboardPageProps) {
           <StatCard title="Total Expense" amount={summary.expense} />
         </section>
 
-        <FinanceChart data={monthlyData} />
+        <Suspense
+          fallback={
+            <Card>
+              <div className="flex h-72 items-center justify-center text-sm text-gray-500">
+                Loading chart...
+              </div>
+            </Card>
+          }
+        >
+          <FinanceChart data={monthlyData} />
+        </Suspense>
 
         <Card>
           <div className="min-w-0 space-y-5">
