@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+/* Enable class-based dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* FinTrack design tokens */
+@theme {
+  --font-sans: "Inter", sans-serif;
+
+  --color-primary: #16a34a;
+  --color-finance-dark: #111827;
+  --color-finance-light: #f8fafc;
+}
