@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Wallet } from "lucide-react";
 
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../hooks/useAuth";
 import { registerSchema, type RegisterFormValues } from "../schemas/authSchema";
 
 import Card from "../components/atoms/Card";

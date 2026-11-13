@@ -1,5 +1,4 @@
 import {
-  createContext,
   useCallback,
   useEffect,
   useMemo,
@@ -7,10 +6,14 @@ import {
   type ReactNode,
 } from "react";
 
+import type { User } from "@supabase/supabase-js";
+
+import { TransactionContext } from "./transaction-context";
+import type { CategoryAppearance } from "../types/category";
 import type { Transaction } from "../types/transaction";
 import type { TransactionFormValues } from "../schemas/transactionSchema";
 
-import { useAuth } from "./AuthContext";
+import useAuth from "../hooks/useAuth";
 
 import {
   createCategory as createCategoryRecord,
@@ -29,66 +32,14 @@ import {
   type TransactionRecord,
 } from "../services/transactionService";
 
-export interface CategoryAppearance {
-  icon: string;
-  color: string;
-  background: string;
-}
-
-export const DEFAULT_CATEGORY_APPEARANCE: CategoryAppearance = {
-  icon: "Tags",
-  color: "text-gray-600 dark:text-gray-300",
-  background: "bg-gray-100 dark:bg-gray-800",
-};
-
-interface TransactionContextValue {
-  transactions: Transaction[];
-  transactionsLoading: boolean;
-
-  summary: {
-    income: number;
-    expense: number;
-    balance: number;
-  };
-
-  categories: string[];
-  categoryRecords: CategoryRecord[];
-  categoriesLoading: boolean;
-
-  categoryAppearances: Record<string, CategoryAppearance>;
-
-  updateCategoryAppearance: (
-    name: string,
-    appearance: CategoryAppearance,
-  ) => Promise<boolean>;
-
-  addTransaction: (data: TransactionFormValues) => Promise<boolean>;
-  updateTransaction: (
-    id: string,
-    data: TransactionFormValues,
-  ) => Promise<boolean>;
-  deleteTransaction: (id: string) => Promise<boolean>;
-
-  addCategory: (
-    name: string,
-    appearance: CategoryAppearance,
-  ) => Promise<boolean>;
-
-  updateCategory: (
-    oldName: string,
-    newName: string,
-    appearance: CategoryAppearance,
-  ) => Promise<boolean>;
-
-  deleteCategory: (name: string) => Promise<boolean>;
-}
-
-export const TransactionContext = createContext<TransactionContextValue | null>(
-  null,
-);
-
 interface TransactionProviderProps {
   children: ReactNode;
+}
+
+interface TransactionDataProviderProps {
+  children: ReactNode;
+  user: User | null;
+  authLoading: boolean;
 }
 
 // Mengubah record Supabase menjadi format yang digunakan UI.
@@ -106,35 +57,42 @@ function mapTransaction(
   };
 }
 
+// Provider luar menangani perubahan status autentikasi.
 export function TransactionProvider({ children }: TransactionProviderProps) {
   const { user, loading: authLoading } = useAuth();
 
+  return (
+    <TransactionDataProvider
+      key={authLoading ? "auth-loading" : (user?.id ?? "anonymous")}
+      user={authLoading ? null : user}
+      authLoading={authLoading}
+    >
+      {children}
+    </TransactionDataProvider>
+  );
+}
+
+// Provider internal mengelola data transaksi dan kategori.
+function TransactionDataProvider({
+  children,
+  user,
+  authLoading,
+}: TransactionDataProviderProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [transactionsLoading, setTransactionsLoading] = useState(true);
+  const [transactionsLoading, setTransactionsLoading] = useState(
+    authLoading || Boolean(user),
+  );
 
   const [categoryRecords, setCategoryRecords] = useState<CategoryRecord[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(
+    authLoading || Boolean(user),
+  );
 
   // Memuat kategori dan transaksi milik pengguna yang login.
   useEffect(() => {
+    if (authLoading || !user) return;
+
     let cancelled = false;
-
-    if (authLoading) {
-      return;
-    }
-
-    if (!user) {
-      setCategoryRecords([]);
-      setTransactions([]);
-      setCategoriesLoading(false);
-      setTransactionsLoading(false);
-      return;
-    }
-
-    setCategoryRecords([]);
-    setTransactions([]);
-    setCategoriesLoading(true);
-    setTransactionsLoading(true);
 
     async function loadData() {
       try {
@@ -182,7 +140,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
     return () => {
       cancelled = true;
     };
-  }, [user?.id, authLoading]);
+  }, [user, authLoading]);
 
   // Nama kategori diturunkan dari record Supabase.
   const categories = useMemo(

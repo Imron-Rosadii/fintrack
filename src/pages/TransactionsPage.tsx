@@ -224,6 +224,13 @@ function TransactionsPage({ isDark, onToggleTheme }: TransactionsPageProps) {
 
           {/* Table */}
           <TransactionTable
+            key={JSON.stringify([
+              searchTerm,
+              typeFilter,
+              categoryFilter,
+              monthFilter,
+              filteredTransactions,
+            ])}
             transactions={filteredTransactions}
             onEdit={openEditForm}
             onDelete={handleDeleteRequest}

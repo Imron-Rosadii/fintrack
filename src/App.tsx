@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
-import { TransactionProvider } from "./context/TransactionContext";
+import { TransactionProvider } from "./context/TransactionProvider";
 
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import GuestRoute from "./components/auth/GuestRoute";
 
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -42,9 +43,11 @@ function App() {
   return (
     <TransactionProvider>
       <Routes>
-        {/* Halaman publik */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        {/* Halaman khusus pengguna yang belum login */}
+        <Route element={<GuestRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
 
         {/* Halaman yang membutuhkan autentikasi */}
         <Route element={<ProtectedRoute />}>

@@ -1,39 +1,9 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import type { AuthError, Session, User } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 
 import { supabase } from "../lib/supabase";
-
-interface AuthContextValue {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-
-  signUp: (
-    email: string,
-    password: string,
-  ) => Promise<{
-    error: AuthError | null;
-    session: Session | null;
-    user: User | null;
-  }>;
-
-  signIn: (
-    email: string,
-    password: string,
-  ) => Promise<{ error: AuthError | null }>;
-
-  signOut: () => Promise<{ error: AuthError | null }>;
-}
-
-export const AuthContext = createContext<AuthContextValue | null>(null);
+import { AuthContext } from "./auth-context";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -41,7 +11,9 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<
+    import("@supabase/supabase-js").Session | null
+  >(null);
   const [loading, setLoading] = useState(true);
 
   // Memeriksa session dan memantau perubahan autentikasi
@@ -118,15 +90,4 @@ export function AuthProvider({ children }: AuthProviderProps) {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-// Custom hook untuk mengakses autentikasi
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-
-  return context;
 }

@@ -10,10 +10,8 @@ import Card from "../atoms/Card";
 import Button from "../atoms/Button";
 import CategoryBadge from "../molecules/CategoryBadge";
 
-import {
-  DEFAULT_CATEGORY_APPEARANCE,
-  type CategoryAppearance,
-} from "../../context/TransactionContext";
+import type { CategoryAppearance } from "../../types/category";
+import { DEFAULT_CATEGORY_APPEARANCE } from "../../constants/categoryAppearance";
 
 import { formatCurrency } from "../../utils/currency";
 

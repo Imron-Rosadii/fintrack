@@ -6,11 +6,10 @@ import ConfirmDialog from "../components/molecules/ConfirmDialog";
 import CategoryList from "../components/organisms/CategoryList";
 
 import useTransactions from "../hooks/useTransactions";
-import { DEFAULT_CATEGORY_APPEARANCE } from "../context/TransactionContext";
+import { DEFAULT_CATEGORY_APPEARANCE } from "../constants/categoryAppearance";
 
-import CategoryForm, {
-  CATEGORY_COLORS,
-} from "../components/organisms/CategoryForm";
+import CategoryForm from "../components/organisms/CategoryForm";
+import { CATEGORY_COLORS } from "../constants/categoryColors";
 
 interface CategoriesPageProps {
   isDark: boolean;

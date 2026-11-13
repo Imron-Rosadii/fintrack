@@ -17,10 +17,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import {
-  DEFAULT_CATEGORY_APPEARANCE,
-  type CategoryAppearance,
-} from "../../context/TransactionContext";
+import type { CategoryAppearance } from "../../types/category";
+import { DEFAULT_CATEGORY_APPEARANCE } from "../../constants/categoryAppearance";
 
 export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   Tags,

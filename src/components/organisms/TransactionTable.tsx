@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { formatCurrency } from "../../utils/currency";
@@ -10,7 +10,7 @@ import Badge from "../atoms/Badge";
 import CategoryBadge from "../molecules/CategoryBadge";
 import useTransactions from "../../hooks/useTransactions";
 
-import { DEFAULT_CATEGORY_APPEARANCE } from "../../context/TransactionContext";
+import { DEFAULT_CATEGORY_APPEARANCE } from "../../constants/categoryAppearance";
 
 interface TransactionTableProps {
   transactions: Transaction[];
@@ -63,11 +63,6 @@ function TransactionTable({
 
   const totalTransactions = transactions.length;
   const totalPages = Math.ceil(totalTransactions / pageSize);
-
-  // Kembali ke halaman pertama ketika hasil pencarian/filter berubah.
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [transactions]);
 
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalTransactions);

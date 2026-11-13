@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import Button from "../atoms/Button";
@@ -18,7 +18,7 @@ import CategoryBadge from "../molecules/CategoryBadge";
 
 import useTransactions from "../../hooks/useTransactions";
 
-import { DEFAULT_CATEGORY_APPEARANCE } from "../../context/TransactionContext";
+import { DEFAULT_CATEGORY_APPEARANCE } from "../../constants/categoryAppearance";
 
 interface TransactionFormProps {
   initialData?: Transaction | null;
@@ -52,7 +52,6 @@ function TransactionForm({
     handleSubmit,
     control,
     reset,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
@@ -61,7 +60,10 @@ function TransactionForm({
 
   const { categoryAppearances } = useTransactions();
 
-  const selectedCategory = watch("category");
+  const selectedCategory = useWatch({
+    control,
+    name: "category",
+  });
 
   useEffect(() => {
     if (initialData) {
